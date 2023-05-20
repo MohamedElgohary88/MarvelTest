@@ -1,4 +1,4 @@
-package com.example.marveltest.data.remote.domain
+package com.example.marveltest.data.remote.domain.models
 
 
 import com.google.gson.annotations.SerializedName

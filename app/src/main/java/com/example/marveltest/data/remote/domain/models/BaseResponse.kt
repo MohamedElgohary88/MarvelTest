@@ -1,4 +1,4 @@
-package com.example.marveltest.data.remote.domain
+package com.example.marveltest.data.remote.domain.models
 
 
 import com.google.gson.annotations.SerializedName
@@ -28,7 +28,7 @@ data class Data(
     @SerializedName("offset")
     val offset: Int?,
     @SerializedName("results")
-    val seriesResults: List<SeriesResult>?,
+    val seriesResultDtos: List<SeriesResultDto>?,
     @SerializedName("total")
     val total: Int?
 )

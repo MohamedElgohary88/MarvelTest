@@ -6,7 +6,7 @@
     <data>
         <variable
             name="item"
-            type="com.example.marveltest.data.remote.domain.SeriesResult" />
+            type="com.example.marveltest.data.remote.domain.models.Series" />
     </data>
 
 
@@ -26,7 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_gravity="top"
-                imageUrl="@{item.thumbnail.toUrl()}"
+                imageUrl="@{item.imageURL}"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
                 android:scaleType="centerCrop"
                 tools:srcCompat="@tools:sample/avatars" />

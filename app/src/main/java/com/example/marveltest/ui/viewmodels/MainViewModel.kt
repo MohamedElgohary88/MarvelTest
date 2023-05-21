@@ -16,9 +16,8 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
-    private val repository: MainRepository
-) : ViewModel(), SeriesListener {
+class MainViewModel @Inject constructor(private val repository: MainRepository) : ViewModel(),
+    SeriesListener {
 
     val series = MutableLiveData<Status<List<Series>>>()
 
@@ -39,20 +38,15 @@ class MainViewModel @Inject constructor(
         repository.getSeries().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe(
                 {
-                    ::onSeriesSuccess
-                    Log.i("what", it.toString())
+                    it.toData()?.let { result ->
+                        series.postValue(Status.Success(result))
+                        Log.i("post", it.toString())
+                    }
                 },
                 {
                     Log.i("whatt", it.toString())
                 }
             )
-    }
-
-    private fun onSeriesSuccess(status: List<Series>) {
-        status.let { result ->
-            series.postValue(Status.Success(result))
-            Log.i("post", result.toString())
-        }
     }
 
     override fun onClickSeries(id: Int) {

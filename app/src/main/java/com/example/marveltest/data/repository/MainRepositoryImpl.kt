@@ -1,35 +1,35 @@
 package com.example.marveltest.data.repository
 
-import com.example.marveltest.data.util.Status
+import android.util.Log
+import com.example.marveltest.data.local.SeriesDao
+import com.example.marveltest.data.local.SeriesDatabase
+import com.example.marveltest.data.local.SeriesEntity
+import com.example.marveltest.data.mapper.SeriesMapper
 import com.example.marveltest.data.remote.api.Api
-import com.example.marveltest.data.remote.domain.BaseResponse
-import com.example.marveltest.data.remote.domain.SeriesResult
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
-import retrofit2.Response
+import com.example.marveltest.data.remote.api.MarvelApiService
+import com.example.marveltest.data.util.Status
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 
-class MainRepositoryImpl : MainRepository {
+class MainRepositoryImpl(
+    private val apiService: MarvelApiService,
+    private val seriesMapper: SeriesMapper,
+    private val seriesdao: SeriesDao
+) : MainRepository {
 
-    private val apiService by lazy { Api.apiService }
-
-    override fun getSeries(): Single<Status<BaseResponse<SeriesResult>?>> {
-        return wrapperToState(apiService.getSeries())
-    }
-
-    private fun <T> wrapperToState(response: Single<Response<BaseResponse<T>>>)
-            : Single<Status<BaseResponse<T>?>> {
-        return response.map {
-            try {
-                if (it.isSuccessful) {
-                    Status.Success(it.body())
-                } else {
-                    Status.Failure(it.message())
-                }
-            } catch (e: Exception) {
-                Status.Failure(e.message.toString())
+    override fun refreshSeries(): Completable {
+        val response = apiService.getSeries()
+        return response.concatMapCompletable { baseResponse ->
+            val items = baseResponse.body()?.data?.seriesResultDtos?.map {
+                seriesMapper.map(it)
             }
-        }.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            items?.let { seriesdao.insertSeries(items).subscribe() }
+            Log.i("items", items.toString())
+            Completable.complete()
+        }
     }
 
+    override fun getSeries(): Observable<Status<List<SeriesEntity>?>> {
+        return seriesdao.getAllSeries().map { Status.Success(it) }
+    }
 }

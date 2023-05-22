@@ -4,17 +4,18 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.marveltest.data.local.SeriesEntity
 import com.example.marveltest.data.util.Status
-import com.example.marveltest.data.remote.domain.SeriesResult
+import com.example.marveltest.data.remote.domain.SeriesResultDto
 import com.example.marveltest.data.repository.MainRepository
 import com.example.marveltest.data.repository.MainRepositoryImpl
 import com.example.marveltest.ui.adapter.SeriesListener
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class MainViewModel : ViewModel(), SeriesListener {
-    val series = MutableLiveData<Status<List<SeriesResult>>>()
-    private val repository: MainRepository by lazy { MainRepositoryImpl() }
+class MainViewModel(private val repository: MainRepository) : ViewModel(), SeriesListener {
+
+    val series = MutableLiveData<Status<List<SeriesEntity>>>()
 
     init {
         loadData()
@@ -26,11 +27,16 @@ class MainViewModel : ViewModel(), SeriesListener {
 
     @SuppressLint("CheckResult")
     private fun getSeries() {
+
+        repository.refreshSeries().subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe({}, {})
+
         repository.getSeries().subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread()).subscribe(
                 {
-                    it.toData()?.data?.seriesResults?.let { result ->
-                        series.postValue(Status.Success(result))
+                    it.toData()?.let {
+                        series.postValue(Status.Success(it))
+                        Log.i("mydata", it.toString())
                     }
                 },
                 {

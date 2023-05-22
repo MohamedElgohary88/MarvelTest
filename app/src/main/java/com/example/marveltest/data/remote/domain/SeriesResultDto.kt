@@ -3,7 +3,7 @@ package com.example.marveltest.data.remote.domain
 
 import com.google.gson.annotations.SerializedName
 
-data class SeriesResult(
+data class SeriesResultDto(
     @SerializedName("description")
     val description: String?,
     @SerializedName("endYear")

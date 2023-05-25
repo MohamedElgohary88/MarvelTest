@@ -6,10 +6,11 @@ import com.example.marveltest.data.util.Status
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.flow.Flow
 
 interface MainRepository {
 
-    fun getSeries(): Observable<Status<List<Series>>>
+    fun getSeries(): Flow<Status<List<Series>>>
 
-    fun refreshSeries(): Completable
+    suspend fun refreshSeries()
 }

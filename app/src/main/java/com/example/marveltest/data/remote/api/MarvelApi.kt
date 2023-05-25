@@ -16,10 +16,9 @@ const val Api_Key = "ff5123154d30d947ea895d048a5cc47c&hash=82b68ee18585f04cb64af
 
 interface MarvelApiService {
     @GET("v1/public/series?ts=1&apikey=$Api_Key")
-    fun getSeries(): Single<Response<BaseResponse<SeriesResultDto>>>
+    suspend fun getSeries(): Response<BaseResponse<SeriesResultDto>>
 }
 
 object Api {
-     const val BASE_URl = "https://gateway.marvel.com/"
-
+    const val BASE_URl = "https://gateway.marvel.com/"
 }
